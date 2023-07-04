@@ -1,0 +1,113 @@
+{
+  "name": "NucleiSegmentation-Cellpose",
+  "description": "2D nuclei segmentation using Cellpose",
+  "container-image": {
+    "image": "torecluik/t_nucleisegmentation-cellpose",
+    "type": "singularity"
+  },
+  "command-line": "python wrapper.py CYTOMINE_HOST CYTOMINE_PUBLIC_KEY CYTOMINE_PRIVATE_KEY CYTOMINE_ID_PROJECT CYTOMINE_ID_SOFTWARE DIAMETER PROB_THRESHOLD NUC_CHANNEL USE_GPU CP_MODEL",
+  "inputs": [
+    {
+      "id": "cytomine_host",
+      "value-key": "@ID",
+      "command-line-flag": "--@id",
+      "name": "Cytomine host",
+      "set-by-server": true,
+      "optional": false,
+      "type": "String"
+    },
+    {
+      "id": "cytomine_public_key",
+      "value-key": "@ID",
+      "command-line-flag": "--@id",
+      "name": "Cytomine public key",
+      "set-by-server": true,
+      "optional": false,
+      "type": "String"
+    },
+    {
+      "id": "cytomine_private_key",
+      "value-key": "@ID",
+      "command-line-flag": "--@id",
+      "name": "Cytomine private key",
+      "set-by-server": true,
+      "optional": false,
+      "type": "String"
+    },
+    {
+      "id": "cytomine_id_project",
+      "value-key": "@ID",
+      "command-line-flag": "--@id",
+      "name": "Cytomine project ID",
+      "set-by-server": true,
+      "optional": false,
+      "type": "Number"
+    },
+    {
+      "id": "cytomine_id_software",
+      "value-key": "@ID",
+      "command-line-flag": "--@id",
+      "name": "Cytomine software ID",
+      "set-by-server": true,
+      "optional": false,
+      "type": "Number"
+    },
+    {
+      "id": "diameter",
+      "value-key": "@ID",
+      "command-line-flag": "--@id",
+      "name": "Nuclei diameter (if 0 cellpose will estimate for each image)",
+      "description": "Nuclei diameter (if 0 cellpose will estimate for each image)",
+      "default-value": 0,
+      "set-by-server": false,
+      "optional": true,
+      "type": "Number"
+    },
+    {
+      "id": "prob_threshold",
+      "value-key": "@ID",
+      "command-line-flag": "--@id",
+      "name": "Probability threshold, centered at 0.0",
+      "description": "Probability threshold, centered at 0.0",
+      "default-value": 0.5,
+      "set-by-server": false,
+      "optional": true,
+      "type": "Number"
+    },
+    {
+      "id": "nuc_channel",
+      "value-key": "@ID",
+      "command-line-flag": "--@id",
+      "name": "Nuclei channel",
+	"description": "Use default 0 for grayscale and RGB that should be converted to grayscale based on luminance. Use 1, 2 or 3 to select a specific RGB channel",
+      "default-value": 0,
+      "set-by-server": false,
+      "optional": true,
+      "type": "Number"
+    },
+    {
+      "id": "use_gpu",
+      "value-key": "@ID",
+      "command-line-flag": "--@id",
+      "name": "GPU acceleration?",
+	    "description": "If true, use GPU. Else use CPU",
+      "default-value": true,
+      "set-by-server": false,
+      "optional": true,
+      "type": "Boolean"
+    },
+    {
+      "id": "cp_model",
+      "value-key": "@ID",
+      "command-line-flag": "--@id",
+      "name": "CellPose Model",
+	    "description": "Use default nuclei for nuclei model. Other option is cyto",
+      "default-value": "nuclei",
+      "set-by-server": false,
+      "optional": true,
+      "type": "String"
+    }
+  ],
+
+  "schema-version": "cytomine-0.1"
+}
