@@ -1,11 +1,11 @@
 {
-  "name": "NucleiSegmentation-Cellpose",
-  "description": "2D nuclei segmentation using Cellpose",
+  "name": "CellExpansion",
+  "description": "2D Cell Expansion for counting granules",
   "container-image": {
-    "image": "torecluik/t_nucleisegmentation-cellpose",
+    "image": "torecluik/w_cellexpansion",
     "type": "singularity"
   },
-  "command-line": "python wrapper.py CYTOMINE_HOST CYTOMINE_PUBLIC_KEY CYTOMINE_PRIVATE_KEY CYTOMINE_ID_PROJECT CYTOMINE_ID_SOFTWARE DIAMETER PROB_THRESHOLD NUC_CHANNEL USE_GPU CP_MODEL",
+  "command-line": "python wrapper.py CYTOMINE_HOST CYTOMINE_PUBLIC_KEY CYTOMINE_PRIVATE_KEY CYTOMINE_ID_PROJECT CYTOMINE_ID_SOFTWARE MAX_PIXELS DISCARD_CELLS_WITHOUT_CYTOPLASM",
   "inputs": [
     {
       "id": "cytomine_host",
@@ -53,59 +53,26 @@
       "type": "Number"
     },
     {
-      "id": "diameter",
+      "id": "max_pixels",
       "value-key": "@ID",
       "command-line-flag": "--@id",
-      "name": "Nuclei diameter (if 0 cellpose will estimate for each image)",
-      "description": "Nuclei diameter (if 0 cellpose will estimate for each image)",
-      "default-value": 0,
+      "name": "Max pixels",
+      "description": "Max pixels to expand the cell with",
+      "default-value": 25,
       "set-by-server": false,
       "optional": true,
       "type": "Number"
     },
     {
-      "id": "prob_threshold",
+      "id": "discard_cells_without_cytoplasm",
       "value-key": "@ID",
       "command-line-flag": "--@id",
-      "name": "Probability threshold, centered at 0.0",
-      "description": "Probability threshold, centered at 0.0",
-      "default-value": 0.5,
-      "set-by-server": false,
-      "optional": true,
-      "type": "Number"
-    },
-    {
-      "id": "nuc_channel",
-      "value-key": "@ID",
-      "command-line-flag": "--@id",
-      "name": "Nuclei channel",
-	"description": "Use default 0 for grayscale and RGB that should be converted to grayscale based on luminance. Use 1, 2 or 3 to select a specific RGB channel",
-      "default-value": 0,
-      "set-by-server": false,
-      "optional": true,
-      "type": "Number"
-    },
-    {
-      "id": "use_gpu",
-      "value-key": "@ID",
-      "command-line-flag": "--@id",
-      "name": "GPU acceleration?",
-	    "description": "If true, use GPU. Else use CPU",
+      "name": "Discard cells without Cytoplasm?",
+	    "description": "If true, we will discard cells without cytoplasm",
       "default-value": true,
       "set-by-server": false,
       "optional": true,
       "type": "Boolean"
-    },
-    {
-      "id": "cp_model",
-      "value-key": "@ID",
-      "command-line-flag": "--@id",
-      "name": "CellPose Model",
-	    "description": "Use default nuclei for nuclei model. Other option is cyto",
-      "default-value": "nuclei",
-      "set-by-server": false,
-      "optional": true,
-      "type": "String"
     }
   ],
 
