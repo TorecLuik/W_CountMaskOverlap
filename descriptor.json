@@ -1,11 +1,11 @@
 {
-  "name": "CellExpansion",
-  "description": "2D Cell Expansion for counting granules",
+  "name": "CountMaskOverlap",
+  "description": "Counting granules in cells. Provide input in 1 directory with suffixes on pairs of masks.",
   "container-image": {
-    "image": "torecluik/w_cellexpansion",
+    "image": "torecluik/w_countmaskoverlap",
     "type": "singularity"
   },
-  "command-line": "python wrapper.py CYTOMINE_HOST CYTOMINE_PUBLIC_KEY CYTOMINE_PRIVATE_KEY CYTOMINE_ID_PROJECT CYTOMINE_ID_SOFTWARE MAX_PIXELS DISCARD_CELLS_WITHOUT_CYTOPLASM",
+  "command-line": "python wrapper.py CYTOMINE_HOST CYTOMINE_PUBLIC_KEY CYTOMINE_PRIVATE_KEY CYTOMINE_ID_PROJECT CYTOMINE_ID_SOFTWARE CELL_MASK_SUFFIX AGGREGATE_MASK_SUFFIX COLUMN_NAME",
   "inputs": [
     {
       "id": "cytomine_host",
@@ -53,26 +53,48 @@
       "type": "Number"
     },
     {
-      "id": "max_pixels",
+      "id": "cell_mask_suffix",
       "value-key": "@ID",
       "command-line-flag": "--@id",
-      "name": "Max pixels",
-      "description": "Max pixels to expand the cell with",
-      "default-value": 25,
+      "name": "Cell Mask Suffix",
+      "description": "To differentiate between masks. Cell mask suffix that you have added to the filename, before file extension.",
+      "default-value": "_C",
       "set-by-server": false,
       "optional": true,
-      "type": "Number"
+      "type": "String"
     },
     {
-      "id": "discard_cells_without_cytoplasm",
+      "id": "aggregate_mask_suffix",
       "value-key": "@ID",
       "command-line-flag": "--@id",
-      "name": "Discard cells without Cytoplasm?",
-	    "description": "If true, we will discard cells without cytoplasm",
-      "default-value": true,
+      "name": "Aggregate Mask Suffix",
+	    "description": "To differentiate between masks. Aggregate mask suffix that you have added to the filename, before file extension",
+      "default-value": "_A",
       "set-by-server": false,
       "optional": true,
-      "type": "Boolean"
+      "type": "String"
+    },
+    {
+      "id": "column_name_counts",
+      "value-key": "@ID",
+      "command-line-flag": "--@id",
+      "name": "Column Name",
+	    "description": "Name of the column with aggregate counts",
+      "default-value": "counts",
+      "set-by-server": false,
+      "optional": true,
+      "type": "String"
+    },
+    {
+      "id": "column_name_cells",
+      "value-key": "@ID",
+      "command-line-flag": "--@id",
+      "name": "Column Name",
+	    "description": "Name of the column with cell (mask) index",
+      "default-value": "cells",
+      "set-by-server": false,
+      "optional": true,
+      "type": "String"
     }
   ],
 
