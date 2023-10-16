@@ -10,6 +10,7 @@ from biaflows.helpers import BiaflowsJob, prepare_data, get_discipline
 # code for workflow:
 from pyCountOverlap import count_overlap
 import pandas as pd
+import time
 
 
 def main(argv):
@@ -22,11 +23,13 @@ def main(argv):
         
         in_imgs, gt_imgs, in_path, gt_path, out_path, tmp_path = prepare_data(
             get_discipline(bj, default=CLASS_SPTCNT), bj, is_2d=True, **bj.flags)
-        print(in_path, in_imgs)
-        print(os.listdir(in_path), os.listdir('/data/in'))
-        in_imgs = os.listdir('/data/in')
         # 1b. MAKE SURE TMP PATH IS UNIQUE
-        tmp_path = gt_path
+        try:
+            tmp_path += f"/{int(time.time() * 1000)}"  # timestamp in ms
+            os.mkdir(tmp_path)  # setup tmp
+        except FileExistsError:
+            tmp_path += f"/{int(time.time() * 10000)}"  # timestamp in ms
+            os.mkdir(tmp_path)  # setup tmp
         # 1c. Read parameters from commandline
         
         cmsuffix = bj.parameters.cell_mask_suffix
@@ -40,38 +43,65 @@ def main(argv):
         # 2. Run image analysis workflow
         print("Launching workflow...")
 
-        # 2a. Add here the code for running the analysis script     
+        # 2a. Add here the code for running the analysis script             
         def find_pairs(in_imgs, cmsuffix='_C', amsuffix='_A'):
+            '''
+            Finds pairs of filenames based on provided suffixes.
+
+            Args:
+                in_imgs (list): List of input filenames.
+                cmsuffix (str, optional): Suffix for the first pair element. Defaults to '_C'.
+                amsuffix (str, optional): Suffix for the second pair element. Defaults to '_A'.
+
+            Returns:
+                tuple: A tuple containing two elements:
+                    - set: Set of base names without suffixes, for which pairs were found.
+                    - list: List of pairs (filename with cmsuffix, filename with amsuffix).
+
+            Note:
+                This function assumes that pairs will have the same extension in the input filenames.
+
+                Prints if the input filename format is invalid or if pairs are mismatched.
+
+            Examples:
+                >>> in_imgs = ['file1_C.txt', 'file1_A.txt', 'file2_A.txt']
+                >>> find_pairs(in_imgs)
+                Error: Mismatched or missing pair for file2. Skipping.
+                ({'file1'}, [('file1_C.txt', 'file1_A.txt')])
+            '''
             pairs = []
             base_names = set()
             skipped_base_names = set()
-            
+
+            in_imgs = [img.filename for img in in_imgs]
             for filename in in_imgs:
                 try:
-                    base_name, extension = filename.rsplit('.', 1)
-                    print(base_name, extension)
-                    if base_name.endswith(cmsuffix):
-                        base_names.add(base_name[:-len(cmsuffix)])
-                    print(base_names)
+                    if cmsuffix in filename:
+                        base_name, extension = filename.rsplit(cmsuffix, 1)
+                    elif amsuffix in filename:
+                        base_name, extension = filename.rsplit(amsuffix, 1)
+                    else:
+                        raise ValueError(f"Invalid filename format: {filename}")
+                    
+                    base_names.add((base_name, extension))
                 except ValueError:
-                    print(f"Error: Invalid filename format for {filename}. Skipping.")
+                    print(f"Error: Invalid filename format for {filename} for suffixes {cmsuffix}/{amsuffix}. Skipping.")
                     continue
-                
-            for base_name in base_names:
-                cm_filename = f'{base_name}{cmsuffix}.{extension}'
-                am_filename = f'{base_name}{amsuffix}.{extension}'
-                
+
+            for base_name, extension in base_names:
+                cm_filename = f'{base_name}{cmsuffix}{extension}'
+                am_filename = f'{base_name}{amsuffix}{extension}'
                 if cm_filename in in_imgs and am_filename in in_imgs:
                     pairs.append((cm_filename, am_filename))
                 else:
                     skipped_base_names.add(base_name)
                     print(f"Error: Mismatched or missing pair for {base_name}. Skipping.")
-            
+
+            base_names = {item[0] for item in base_names} # keep only the actual base_name
             base_names -= skipped_base_names  # Using set difference
-            
+
             return base_names, pairs
-        
-        print(f"IN: {in_imgs}. Suffixes: {cmsuffix}, {amsuffix}")
+                       
         base_names, mask_pairs = find_pairs(in_imgs, cmsuffix=cmsuffix, 
                                             amsuffix=amsuffix)
         print(f"Found {len(base_names)} pairs: {base_names}")
@@ -81,6 +111,7 @@ def main(argv):
 
         # Iterate over pairs and concatenate results
         for basename, (big_mask, small_mask) in zip(base_names, mask_pairs):
+            print(basename, big_mask, small_mask)
             big_mask = os.path.join(in_path, big_mask)
             small_mask = os.path.join(in_path, small_mask)
             df = count_overlap(big_mask, small_mask, columnName=c_counts)
